@@ -8,13 +8,16 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Session;
 
+
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected function message($message, $class = 'alert alert-info')
-    {
-        Session::flash('message', $message);
-        Session::flash('class', $class);
-    }
+
+
+//    protected function message($message, $class = 'alert alert-info')
+//    {
+//        Session::flash('message', $message);
+//        Session::flash('class', $class);
+//    }
 }

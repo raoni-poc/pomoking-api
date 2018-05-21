@@ -2,6 +2,7 @@
 
 namespace App\ActiveRecord;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -28,10 +29,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\ActiveRecord\Category[] $categories
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\ActiveRecord\Pomodoro[] $pomodoros
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\ActiveRecord\User[] $users
+ * @property string|null $completed_at
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\ActiveRecord\Task whereCompletedAt($value)
  */
 class Task extends Model
 {
-    use SoftDeletes;
+//    use SoftDeletes;
+    public $timestamps = true;
+    protected $dates = ['created_at', 'updated_at', 'completed_at'];
 
     public function pomodoros()
     {
@@ -48,13 +53,21 @@ class Task extends Model
         return $this->belongsToMany(Category::class);
     }
 
-    protected static function boot() {
+    protected static function boot()
+    {
         parent::boot();
 
-        static::deleting(function(Task $category) {
+        static::deleting(function (Task $category) {
             $category->pomodoros()->sync([]);
             $category->users()->sync([]);
             $category->categories()->sync([]);
         });
     }
+
+//    public function getCompletedAtAttribute($value)
+//    {
+//        if (!is_null($value)) {
+//            return Carbon::createFromTimeString($value);
+//        }
+//    }
 }

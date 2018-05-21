@@ -9,7 +9,9 @@
   "type": "project",
   "require": {
     "php": ">=7.0.0",
+    "barryvdh/laravel-cors": "^0.11.0",
     "doctrine/dbal": "^2.5",
+    "ellipsesynergie/api-response": "^0.15.0",
     "fideloper/proxy": "~3.3",
     "laravel/cashier": "~7.0",
     "laravel/framework": "5.5.*",
@@ -59,8 +61,6 @@
     ],
     "post-update-cmd": [
       "Illuminate\\Foundation\\ComposerScripts::postUpdate",
-      "php artisan ide-helper:generate",
-      "php artisan ide-helper:meta",
       "php artisan optimize",
       "php artisan config:cache",
       "php artisan view:clear",
@@ -80,18 +80,6 @@
     {
       "type": "path",
       "url": "./spark"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/rsporteman/category"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/rsporteman/period"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/rsporteman/task"
     }
   ]
 }

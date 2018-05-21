@@ -2,161 +2,113 @@
 
 namespace App\Http\Controllers;
 
-use App\ActiveRecord\Category;
 use App\ActiveRecord\Task;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Http\Resources\Task as TaskResource;
 
-class TaskController extends Controller
+class TaskController extends AbstractApiController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    protected $task;
+
+    public function __construct(TaskResource $resource, Task $task)
     {
-        return view('tasks.index');
+        parent::__construct($resource, $task);
+        $this->task = $this->model;
     }
 
-    public function indexDataTable()
-    {
-        $dataTable = datatables(Auth::user()->tasks);
-        $dataTable->editColumn('task', function (Task $task) {
-            if ($task->completed_at) {
-                $text = "<s>" . $task->task . "</s>";
-            } else {
-                $text = $task->task;
-            }
-            return "<span onclick='changeStatusComplete(" . json_encode($task) . ")'>$text</span>";
-        });
-        $dataTable->addColumn('action', function (Task $task) {
-            return "<button type='button' class='btn btn-primary' data-toggle='modal' data-target='#edit' onclick='modalEdit(" . json_encode($task) . ")'>Edit</button> " .
-                "<button type='button' class='btn btn-warning' data-toggle='modal' data-target='#destroy' onclick='modalDestroy(" . json_encode($task) . ")'>Delete</button>";
-        });
-        $dataTable->rawColumns(['task', 'action']);
-        return $dataTable->make(true);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        throw new NotFoundHttpException;
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        if (!$request->task) {
-            $this->message("You can't leave task empty.", 'alert alert-warning');
-            return redirect()->route('tasks.index')->withInput();
+        dd($request->all());
+        $task = $this->task->newInstance();
+        $task->task = $request->get('task');
+        $task->description = $request->get('description');
+        $task->estimate = (int) $request->get('estimate');
+        $task->created_at = Carbon::now();
+        $task->updated_at = Carbon::now();
+        $completed = false;
+        $completed = false;
+        if($task->completed_at){
+            $completed = true;
         }
-
-        $task = new Task();
-        $task->task = $request->task;
-        $task->categories()->sync([$request->category]);
-
+        if (!is_null($request->completed) && $request->completed != $completed ) {
+            if($request->completed) {
+                $task->completed_at = Carbon::now();
+            }
+            if(!$request->completed) {
+                $task->completed_at = null;
+            }
+        }
         if ($task->save()) {
-            $task->users()->sync([Auth::user()->id]);
-            $this->message("Success! Task create.", 'alert alert-success');
-        } else {
-            $this->message("Error! Task not saved yet.", 'alert alert-danger');
+            return $this->resource->make($task);
         }
-
-        return redirect()->route('tasks.index')->withInput();
+        return $this->jsonResponse(['error' => 'Could not create a task'], 500);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    public function update(Request $request)
     {
-        throw new NotFoundHttpException;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        throw new NotFoundHttpException;
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        if (!Auth::user()->tasks->contains($id)) {
-            throw new NotFoundHttpException;
+        $task = $this->task->find($request->get('id'));
+        if (!$task) {
+            return $this->modelNotFound('task not found');
         }
-
-        $task = Task::find($id);
-        $task->task = $request->task;
-        $task->categories()->sync([$request->category]);
-
+        if (!is_null($request->task)) {
+            $task->task = $request->get('task');
+        }
+        if (!is_null($request->description)) {
+            $task->description = $request->get('description');
+        }
+        if (!is_null($request->estimate)) {
+            $task->estimate = (int) $request->get('estimate');
+        }
+        $completed = false;
+        if($task->completed_at){
+            $completed = true;
+        }
+        if (!is_null($request->completed) && $request->completed != $completed ) {
+            if($request->completed) {
+                $task->completed_at = Carbon::now();
+            }
+            if(!$request->completed) {
+                $task->completed_at = null;
+            }
+        }
         if ($task->save()) {
-            $this->message("Success! Task edited.", 'alert alert-success');
-        } else {
-            $this->message("Error! Task not saved yet.", 'alert alert-danger');
+            if (!is_null($request->category)) {
+                $task->categories()->sync([$request->category]);
+            }
+            if (!is_null($request->pomodoros)) {
+                $task->pomodoros()->sync([$request->pomodoros]);
+            }
+            return $this->resource->make($task);
         }
-
-        return redirect()->route('tasks.index')->withInput();
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        if (!Auth::user()->tasks->contains($id)) {
-            throw new NotFoundHttpException;
-        }
-        $task = Task::find($id);
-        if ($task->delete()) {
-            $this->message("Task deleted.", 'alert alert-success');
-        } else {
-            $this->message("Error! Task not deleted yet.", 'alert alert-danger');
-        }
-        return redirect()->route('tasks.index')->withInput();
+        return $this->jsonResponse(['error' => 'Could not updated a task'], 500);
     }
 
     public function changeCompleteStatus($id)
     {
-        if (!Auth::user()->tasks->contains($id)) {
-            throw new NotFoundHttpException;
+        $task = $this->task->find($id);
+        if (!$task) {
+            return $this->modelNotFound('task not found');
         }
-        $task = Task::find($id);
-
         if ($task->completed_at) {
             $task->completed_at = null;
         } else {
-            $task->completed_at = date('Y-m-d h:i:s');
+            $task->completed_at = Carbon::now();
         }
-        $task->save();
-        return $task->completed_at;
+        if ($task->save()) {
+            $task->updated_at = Carbon::now();
+            return $this->resource->make($task);
+        }
+        return $this->jsonResponse(['error' => 'Could not updated a task'], 500);
+    }
+
+    protected function updateRules(): array
+    {
+        return [];
+    }
+
+    protected function storeRules(): array
+    {
+        return [];
     }
 }

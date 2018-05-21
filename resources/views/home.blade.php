@@ -9,5 +9,3 @@
         {{--<a href="{{ route('tasks.index') }}">Tasks</a>--}}
     </div>
 @endsection
-
-

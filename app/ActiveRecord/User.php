@@ -73,6 +73,13 @@ use Laravel\Spark\User as SparkUser;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\ActiveRecord\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\ActiveRecord\User whereUsesTwoFactorAuth($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\ActiveRecord\User whereVatId($value)
+ * @property string|null $deleted_at
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\ActiveRecord\User onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\ActiveRecord\User whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\ActiveRecord\User withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\ActiveRecord\User withoutTrashed()
  */
 class User extends SparkUser
 {

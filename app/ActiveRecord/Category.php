@@ -2,8 +2,9 @@
 
 namespace App\ActiveRecord;
 
-use Illuminate\Database\Eloquent\Collection;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;;
 
 /**
  * App\ActiveRecord\Category
@@ -27,6 +28,9 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     protected $table = 'categories';
+    protected $fillable = ['id', 'category'];
+    protected $dates = ['created_at', 'updated_at'];
+    public $timestamps = true;
 
     public function pomodoros()
     {

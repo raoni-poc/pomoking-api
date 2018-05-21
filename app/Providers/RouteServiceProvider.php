@@ -70,10 +70,10 @@ class RouteServiceProvider extends ServiceProvider
     {
         $router->group([
             'namespace' => $this->namespace,
-            'middleware' => 'pomoking-api',
-            'prefix' => 'pomoking-api',
+            'middleware' => 'api',
+            'prefix' => 'api',
         ], function ($router) {
-            require base_path('routes/pomoking-api.php');
+            require base_path('routes/api.php');
         });
     }
 }

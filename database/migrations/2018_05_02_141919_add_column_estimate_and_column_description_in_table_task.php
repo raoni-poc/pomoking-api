@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnIsCompleteInTableTasks extends Migration
+class AddColumnEstimateAndColumnDescriptionInTableTask extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,8 @@ class AddColumnIsCompleteInTableTasks extends Migration
     public function up()
     {
         Schema::table('tasks', function(Blueprint $table) {
-            $table->timestamp('completed_at')->nullable();
+            $table->integer('estimate')->nullable();
+            $table->text('description')->nullable();
         });
     }
 
@@ -26,7 +27,8 @@ class AddColumnIsCompleteInTableTasks extends Migration
     public function down()
     {
         Schema::table('tasks', function(Blueprint $table) {
-            $table->dropColumn('completed_at');
+            $table->dropColumn('estimate');
+            $table->dropColumn('description');
         });
     }
 }

@@ -13,11 +13,13 @@ use Faker\Generator as Faker;
 |
 */
 
-$factory->define(App\ActiveRecord\User::class, function (Faker $faker) {
+$factory->define(App\ActiveRecord\Pomodoro::class, function (Faker $faker) {
+    $canceledAt = mt_rand(0,100);
+
     return [
-        'name' => $faker->name,
-        'email' => $faker->unique()->safeEmail,
-        'password' => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
-        'remember_token' => str_random(10),
+        'start' => $faker->dateTime,
+        'duration_in_minutes' => mt_rand(20, 30),
+        'canceled_at' => ($canceledAt < 75) ? $faker->dateTime : null,
+        'deleted_at' => null,
     ];
 });

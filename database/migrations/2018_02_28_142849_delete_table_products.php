@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddColumnIsCompleteInTableTasks extends Migration
+class DeleteTableProducts extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,7 @@ class AddColumnIsCompleteInTableTasks extends Migration
      */
     public function up()
     {
-        Schema::table('tasks', function(Blueprint $table) {
-            $table->timestamp('completed_at')->nullable();
-        });
+        Schema::dropIfExists('products');
     }
 
     /**
@@ -25,8 +23,11 @@ class AddColumnIsCompleteInTableTasks extends Migration
      */
     public function down()
     {
-        Schema::table('tasks', function(Blueprint $table) {
-            $table->dropColumn('completed_at');
-        });
+      Schema::create('products', function (Blueprint $table) {
+        $table->increments('id');
+        $table->string('name');
+        $table->integer('price');
+        $table->timestamps();
+      });
     }
 }

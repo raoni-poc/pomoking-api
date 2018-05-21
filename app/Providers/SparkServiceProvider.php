@@ -62,5 +62,9 @@ class SparkServiceProvider extends ServiceProvider
             ->features([
                 'First', 'Second', 'Third'
             ]);
+
+        Spark::useUserModel(\App\ActiveRecord\User::class);
+
+        Spark::useTeamModel(\App\ActiveRecord\Team::class);
     }
 }
